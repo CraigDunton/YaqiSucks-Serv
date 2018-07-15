@@ -14,7 +14,9 @@ var options = {
 };
 
 var pgp = require('pg-promise')(options);
-const connectionString = 'postgres://postgres:stallions@localhost:5432/app';
+pgp.pg.defaults.poolSize = 20; // free heroku postgres max num of connections
+//const connectionString = 'postgres://postgres:stallions@localhost:5432/app';
+const connectionString = process.env.DATABASE_URL;
 const db = pgp(connectionString);
 
 //query functions
@@ -228,7 +230,7 @@ function metUser(req, res, next) {
     .catch(function (err) {
       console.log('error with insert into users_met '+err.message)
     });
-    
+
   db.none('delete from users_meeting where uid=$1 and mid=$2',[req.body.uid,req.body.mid])
     .then(function (result) {
       console.log('successfully removed from users meeting table')
